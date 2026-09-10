@@ -1,11 +1,18 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class PlaneMovement : MonoBehaviour
 {
     [SerializeField] private float forwardMoveSpeed = 10f;
+    [SerializeField] private float forwardBoostSpeed = 70f;
+    [SerializeField] private float boostDuration = 2f;
+    private float currentPlaneSpeed;
     [SerializeField] private float pitchRotationSpeed = 10f;
     [SerializeField] private float rollRotationSpeed = 10f;
+    
 
     [SerializeField] private bool invertedPitch = true;
     private int invertPitch;
@@ -13,34 +20,85 @@ public class PlaneMovement : MonoBehaviour
     private InputSystem_Actions inputActions;
 
     private InputAction flightControllerInput;
+    private InputAction planeBoost;
+    private InputAction planeShoot;
+
+    [SerializeField] private float trailBoostWidth = 1.6f;
+    [SerializeField] private TrailRenderer leftTrail;
+    private TrailRenderer leftTrailBoost;
+    [SerializeField] private TrailRenderer rightTrail;
+    private TrailRenderer rightTrailBoost;
+
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform gun;
 
     private void Awake()
     {
         inputActions = new InputSystem_Actions();
 
         flightControllerInput = inputActions.Player.FlightDirection;
+        planeBoost = inputActions.Player.Boost;
+        planeBoost.performed += PlaneBoosting;
+        planeShoot = inputActions.Player.Shoot;
+        planeShoot.performed += PlaneShoot;
+
+        currentPlaneSpeed = forwardMoveSpeed;
+        
     }
 
     private void OnEnable()
     {
         flightControllerInput.Enable();
+        planeBoost.Enable();
+        planeShoot.Enable();
     }
 
     private void OnDisable()
     {
         flightControllerInput.Disable();
+        planeBoost.Disable();
+        planeShoot.Disable();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         invertPitch = invertedPitch ? -1 : 1; //For AB testing
+        leftTrailBoost = leftTrail.transform.GetChild(0).GetComponent<TrailRenderer>();
+        rightTrailBoost = rightTrail.transform.GetChild(0).GetComponent<TrailRenderer>();
+    }
+
+    private void PlaneBoosting(InputAction.CallbackContext obj)
+    {
+        StartCoroutine(PlaneBoostRoutine());
+
+        IEnumerator PlaneBoostRoutine()
+        {
+            currentPlaneSpeed = forwardBoostSpeed;
+            ToggleTrails(true);
+            yield return new WaitForSeconds(boostDuration);
+            currentPlaneSpeed = forwardMoveSpeed;
+            ToggleTrails(false);
+        }
+    }
+
+    private void ToggleTrails(bool isBoosting)
+    {
+        leftTrail.emitting = !isBoosting;
+        rightTrail.emitting = !isBoosting;
+        leftTrailBoost.emitting = isBoosting;
+        rightTrailBoost.emitting = isBoosting;
+    }
+
+    private void PlaneShoot(InputAction.CallbackContext context)
+    {
+        Instantiate(bulletPrefab, gun.position, gun.rotation);
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(new Vector3(0,0,-forwardMoveSpeed*Time.deltaTime));
+        transform.Translate(new Vector3(0,0,-currentPlaneSpeed * Time.deltaTime));
         float pitchAmountDir = invertPitch * flightControllerInput.ReadValue<Vector2>().y;
         transform.Rotate(Vector3.right, pitchRotationSpeed * pitchAmountDir * Time.deltaTime);
         float rollAmountDir = flightControllerInput.ReadValue<Vector2>().x;
