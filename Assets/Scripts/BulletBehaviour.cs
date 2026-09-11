@@ -8,6 +8,7 @@ public class BulletBehaviour : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        rb.AddForce(transform.forward * bulletSpeed, ForceMode.Impulse);
+        rb = GetComponent<Rigidbody>();
+        rb.AddForce(-transform.forward * bulletSpeed, ForceMode.Impulse);
     }
 }
