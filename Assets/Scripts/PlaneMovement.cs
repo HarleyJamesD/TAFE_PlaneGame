@@ -29,7 +29,7 @@ public class PlaneMovement : MonoBehaviour
     [SerializeField] private TrailRenderer rightTrail;
     private TrailRenderer rightTrailBoost;
 
-    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private ObjectPool bulletPool;
     [SerializeField] private Transform gun;
 
     private void Awake()
@@ -92,7 +92,10 @@ public class PlaneMovement : MonoBehaviour
 
     private void PlaneShoot(InputAction.CallbackContext context)
     {
-        Instantiate(bulletPrefab, gun.position, gun.rotation);
+        GameObject bullet = bulletPool.GetObject();
+        bullet.transform.position = gun.position;
+        bullet.transform.rotation = gun.rotation;
+        bullet.SetActive(true);
     }
 
     // Update is called once per frame

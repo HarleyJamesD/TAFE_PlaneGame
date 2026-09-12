@@ -7,7 +7,7 @@ public class ObjectPool : MonoBehaviour
 {
     [SerializeField] private GameObject poolObject;
     [SerializeField] private int startingAmount;
-    private List<GameObject> objectList;
+    private List<GameObject> objectList = new List<GameObject>();
 
     void Start()
     {
@@ -21,7 +21,7 @@ public class ObjectPool : MonoBehaviour
     private GameObject CreateObject(GameObject poolObject)
     {
         //Create object append to list
-        GameObject newObject = Instantiate(poolObject);
+        GameObject newObject = Instantiate(poolObject, transform);
         objectList.Add( newObject );
         return newObject;
     }
@@ -31,6 +31,11 @@ public class ObjectPool : MonoBehaviour
     {
         for (int i=0; i<objectList.Count; i++)
         {
+            if (objectPointer >= objectList.Count) //if spilling over pool, restart
+            {
+                objectPointer = 0;
+            }
+
             //If object is inactive and waiting in pool
             if (!objectList[objectPointer].activeInHierarchy)
             {
@@ -38,18 +43,8 @@ public class ObjectPool : MonoBehaviour
             }
 
             objectPointer++; //increment for next loop iteration
-            if (objectPointer >= objectList.Count) //if spilling over pool, restart
-            {
-                objectPointer = 0;
-            }
         }
         // After iterating through whole pool, if no objects available create object
         return CreateObject(poolObject);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

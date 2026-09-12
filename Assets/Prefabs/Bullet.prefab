@@ -128,7 +128,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8512940111223126149
 Transform:
   m_ObjectHideFlags: 0
@@ -159,6 +159,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   bulletSpeed: 120
+  bulletLifetime: 2
+  explosionVFXObj: {fileID: 8921406431310440453, guid: 99d25099a83483443897478eedeb8c8c, type: 3}
 --- !u!54 &3543018162711946831
 Rigidbody:
   m_ObjectHideFlags: 0
