@@ -23,6 +23,9 @@ public class PlaneMovement : MonoBehaviour
     private InputAction planeBoost;
     private InputAction planeShoot;
 
+    public float PitchAmount { get { return pitchAmount; } }
+    private float pitchAmount;
+
     [SerializeField] private float trailBoostWidth = 1.6f;
     [SerializeField] private TrailRenderer leftTrail;
     private TrailRenderer leftTrailBoost;
@@ -102,8 +105,8 @@ public class PlaneMovement : MonoBehaviour
     void Update()
     {
         transform.Translate(new Vector3(0,0,-currentPlaneSpeed * Time.deltaTime));
-        float pitchAmountDir = invertPitch * flightControllerInput.ReadValue<Vector2>().y;
-        transform.Rotate(Vector3.right, pitchRotationSpeed * pitchAmountDir * Time.deltaTime);
+        pitchAmount = invertPitch * flightControllerInput.ReadValue<Vector2>().y;
+        transform.Rotate(Vector3.right, pitchRotationSpeed * pitchAmount * Time.deltaTime);
         float rollAmountDir = flightControllerInput.ReadValue<Vector2>().x;
         transform.Rotate(Vector3.forward, pitchRotationSpeed * rollAmountDir * Time.deltaTime);
     }

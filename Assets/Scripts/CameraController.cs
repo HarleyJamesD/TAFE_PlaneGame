@@ -6,6 +6,7 @@ public class CameraController : MonoBehaviour
     private Vector3 cameraTargetOffset;
 
     [SerializeField] private Transform plane;
+    private PlaneMovement planeMovement;
     [SerializeField] private Transform cameraDefaultPos;
     [SerializeField] private float cameraFollowSpeed = 1f;
     [SerializeField] private float cameraRotateSpeed = 1f;
@@ -13,6 +14,7 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         GameManager.instance.onPlayerDeath += OnPlayerDeath;
+        planeMovement = plane.GetComponent<PlaneMovement>();
     }
 
     bool playerDead;
@@ -34,10 +36,11 @@ public class CameraController : MonoBehaviour
 
         Quaternion targetRotation = Quaternion.LookRotation(cameraTargetOffset - transform.position);
         Quaternion rotationToPlane = Quaternion.LookRotation(planePos - transform.position);
+        Quaternion defaultPosToTargetRot = Quaternion.LookRotation(cameraTargetOffset - cameraDefaultPos.position);
 
-        if (Mathf.Abs(Quaternion.Dot(targetRotation, transform.rotation)) >= 1 - bufferZone) //1 if theyre perfectly aligned
+        //If plane is not turning (pitch is 0) lerp to camera default pos
+        if (planeMovement.PitchAmount == 0) 
         {
-            //When plane not turning lerp to camera default pos
             transform.position = Vector3.Lerp(transform.position, cameraDefaultPos.position, cameraFollowSpeed * Time.deltaTime);
         }
         else
