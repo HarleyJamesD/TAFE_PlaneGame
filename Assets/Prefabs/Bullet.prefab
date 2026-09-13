@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7972541298822609697}
   - component: {fileID: 926665687210141070}
   - component: {fileID: 2927187828129610003}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BulletLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 8512940111223126149}
   - component: {fileID: 8887176794815746641}
   - component: {fileID: 3543018162711946831}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -187,7 +187,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 3
 --- !u!1 &8313336115603973270
 GameObject:
   m_ObjectHideFlags: 0
@@ -200,7 +200,7 @@ GameObject:
   - component: {fileID: 7335726814194368528}
   - component: {fileID: 2377521085743818588}
   - component: {fileID: 4170963461947717511}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BulletRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
