@@ -41,7 +41,7 @@ public class PlaneMovement : MonoBehaviour
 
         flightControllerInput = inputActions.Player.FlightDirection;
         planeBoost = inputActions.Player.Boost;
-        planeBoost.performed += PlaneBoosting;
+        planeBoost.performed += PlaneBoost;
         planeShoot = inputActions.Player.Shoot;
         planeShoot.performed += PlaneShoot;
 
@@ -71,9 +71,20 @@ public class PlaneMovement : MonoBehaviour
         rightTrailBoost = rightTrail.transform.GetChild(0).GetComponent<TrailRenderer>();
     }
 
-    private void PlaneBoosting(InputAction.CallbackContext obj)
+    private void PlaneBoost(InputAction.CallbackContext obj)
     {
-        StartCoroutine(PlaneBoostRoutine());
+        StartPlaneBoost();
+    }
+
+    Coroutine boostRoutine;
+    public void StartPlaneBoost()
+    {
+        //Check if player already boosting  
+        if (boostRoutine != null)
+        {
+            StopCoroutine(boostRoutine); // Cancel current boost routine to avoid overwriting behaviour
+        }
+        boostRoutine = StartCoroutine(PlaneBoostRoutine());
 
         IEnumerator PlaneBoostRoutine()
         {

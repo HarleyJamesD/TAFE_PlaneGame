@@ -4,7 +4,7 @@ public class LaserPointer : MonoBehaviour
 {
     private LineRenderer lineRenderer;
     [SerializeField] private float distance = 100f;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
         lineRenderer = GetComponent<LineRenderer>();   
@@ -12,7 +12,6 @@ public class LaserPointer : MonoBehaviour
 
     [SerializeField] private LayerMask mask;
     Vector3 tempPos;
-    // Update is called once per frame
     void Update()
     {
         lineRenderer.SetPosition(0, transform.position);

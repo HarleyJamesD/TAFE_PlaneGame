@@ -34,13 +34,11 @@ public class BulletBehaviour : MonoBehaviour
         rb.rotation = Quaternion.identity;
         rb.transform.position = Vector3.zero;
         gameObject.SetActive(false);
-        
-
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Hit collider" + collision.gameObject.name);
+        Debug.Log("Bullet cllision " + collision.gameObject.name);
         Instantiate(explosionVFXObj, transform.position, Quaternion.identity);
         ResetBullet();
     }
