@@ -35,6 +35,11 @@ public class PlaneMovement : MonoBehaviour
     [SerializeField] private ObjectPool bulletPool;
     [SerializeField] private Transform gun;
 
+
+    [SerializeField] private AnimationCurve pitchSpeedRamp;
+    private float durationToMaxPitch = 0.5f;
+    private float t = 0;
+
     private void Awake()
     {
         inputActions = new InputSystem_Actions();
@@ -115,10 +120,26 @@ public class PlaneMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+       //Move forward
         transform.Translate(new Vector3(0,0,-currentPlaneSpeed * Time.deltaTime));
+
+       //Pitch up or down
         pitchAmount = invertPitch * flightControllerInput.ReadValue<Vector2>().y;
-        transform.Rotate(Vector3.right, pitchRotationSpeed * pitchAmount * Time.deltaTime);
-        float rollAmountDir = flightControllerInput.ReadValue<Vector2>().x;
-        transform.Rotate(Vector3.forward, pitchRotationSpeed * rollAmountDir * Time.deltaTime);
+        if (t!=0 && pitchAmount==0)
+        {
+            t = 0; //When not pitching reset time
+        }
+        float tempPitchRotSpeed = pitchRotationSpeed;
+            //Use an animation curve to have an ease-in to pitch rotation
+        if (t <= durationToMaxPitch)
+        {
+            t += Time.deltaTime;
+            tempPitchRotSpeed = pitchSpeedRamp.Evaluate(t / durationToMaxPitch) * pitchRotationSpeed;
+        }
+        transform.Rotate(Vector3.right, tempPitchRotSpeed * pitchAmount * Time.deltaTime);
+
+       //Roll left or right
+        float rollAmountDir = flightControllerInput.ReadValue<Vector2>().x;  
+        transform.Rotate(Vector3.forward, rollRotationSpeed * rollAmountDir * Time.deltaTime);
     }
 }
