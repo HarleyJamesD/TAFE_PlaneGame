@@ -42,8 +42,9 @@ public class PlaneMovement : MonoBehaviour
 
     private void Awake()
     {
-        inputActions = new InputSystem_Actions();
+        //inputActions = new InputSystem_Actions();
 
+        inputActions = GameManager.instance.inputActions;
         flightControllerInput = inputActions.Player.FlightDirection;
         planeBoost = inputActions.Player.Boost;
         planeBoost.performed += PlaneBoost;
@@ -74,6 +75,23 @@ public class PlaneMovement : MonoBehaviour
         invertPitch = invertedPitch ? -1 : 1; //For AB testing
         leftTrailBoost = leftTrail.transform.GetChild(0).GetComponent<TrailRenderer>();
         rightTrailBoost = rightTrail.transform.GetChild(0).GetComponent<TrailRenderer>();
+
+        GameManager.instance.onGamePause += OnPause;
+    }
+
+    private void OnPause(bool isGamePaused)
+    {
+        if (isGamePaused)
+        {
+            flightControllerInput.Disable();
+            planeBoost.Disable();
+            planeShoot.Disable();
+        } else
+        {
+            flightControllerInput.Enable();
+            planeBoost.Enable();
+            planeShoot.Enable();
+        }
     }
 
     private void PlaneBoost(InputAction.CallbackContext obj)
