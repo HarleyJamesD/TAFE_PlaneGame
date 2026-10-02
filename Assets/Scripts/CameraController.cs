@@ -88,12 +88,22 @@ public class CameraController : MonoBehaviour
         playerDead = true;
     }
 
-    [SerializeField] private float bufferZone = 0.05f;
+    //[SerializeField] private float bufferZone = 0.05f;
     void Update()
     {
         if(!playerDead&&!isPaused) CameraFollow();
     }
 
+    private enum CameraFollowState
+    {
+        DefaultCameraFollow,
+        ActiveCameraFollow,
+        TweenBetweenCameraFollow
+    }
+    private CameraFollowState cameraFollowState;
+    float t = 0;
+    [SerializeField] float bufferTweenTime = 0.5f;
+    [SerializeField] AnimationCurve bufferTweenCurve;
     private void CameraFollow()
     {
         Vector3 planePos = plane.position;
@@ -106,13 +116,40 @@ public class CameraController : MonoBehaviour
         //If plane is not turning (pitch is 0) lerp to camera default pos
         if (planeMovement.PitchAmount == 0) 
         {
-            //Lerp between the two points by a factor of cameraFollowSpeed adjusted by Time.deltaTime
-            transform.position = Vector3.Lerp(transform.position, cameraDefaultPos.position, cameraFollowSpeed * Time.deltaTime);
+            cameraFollowState = CameraFollowState.DefaultCameraFollow;
+           
         }
         else
         {
-            //When plane turning follow plane path
-            transform.position = Vector3.Lerp(transform.position, planePos, cameraFollowSpeed * Time.deltaTime);
+            if (cameraFollowState != CameraFollowState.ActiveCameraFollow)
+            {
+                t += Time.deltaTime; //start a buffer time countdown when pitch is not 0
+                cameraFollowState = CameraFollowState.TweenBetweenCameraFollow; //set tweening state here
+            }
+            if (t>= bufferTweenTime) //when buffer ends
+            {
+                t = 0; //Reset t
+                cameraFollowState = CameraFollowState.ActiveCameraFollow; //set to active camera follow
+            }
+            
+        }
+
+        //Camera state management
+        switch (cameraFollowState)
+        {
+            case CameraFollowState.DefaultCameraFollow:
+                transform.position = Vector3.Lerp(transform.position, cameraDefaultPos.position, cameraFollowSpeed * Time.deltaTime);
+                //Lerp between the two points by a factor of cameraFollowSpeed adjusted by Time.deltaTime
+                break;
+            case CameraFollowState.ActiveCameraFollow:
+                transform.position = Vector3.Lerp(transform.position, planePos, cameraFollowSpeed * Time.deltaTime);
+                //When plane turning follow plane path
+                break;
+            case CameraFollowState.TweenBetweenCameraFollow:
+                Vector3 defaultCamera = Vector3.Lerp(transform.position, cameraDefaultPos.position, cameraFollowSpeed * Time.deltaTime);
+                Vector3 activeCamera = Vector3.Lerp(transform.position, planePos, cameraFollowSpeed * Time.deltaTime);
+                transform.position = Vector3.Lerp(defaultCamera, activeCamera, bufferTweenCurve.Evaluate(t / bufferTweenTime));
+                break;
         }
 
         //Smoothly rotate towards target rotation 
