@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -39,6 +40,11 @@ public class PlaneMovement : MonoBehaviour
     [SerializeField] private AnimationCurve pitchSpeedRamp;
     private float durationToMaxPitch = 0.5f;
     private float t = 0;
+
+    [SerializeField] private Transform pitchFlap;
+    [SerializeField] private List<Transform> leftWingFlaps = new List<Transform>();
+    [SerializeField] private List<Transform> rightWingFlaps = new List<Transform>();
+    [SerializeField] private List<Transform> propellerWings = new List<Transform>();
 
     private void Awake()
     {
@@ -135,14 +141,21 @@ public class PlaneMovement : MonoBehaviour
         bullet.SetActive(true);
     }
 
+    [SerializeField] private float flapRotation = 45f;
+    [SerializeField] private float defaultPropellerSpeed = 1f;
     // Update is called once per frame
     void Update()
     {
        //Move forward
         transform.Translate(new Vector3(0,0,-currentPlaneSpeed * Time.deltaTime));
+        foreach (Transform propellerWing in propellerWings)
+        {
+            propellerWing.Rotate(Vector3.up, currentPlaneSpeed* defaultPropellerSpeed *Time.deltaTime);
+        }
 
-       //Pitch up or down
+        //Pitch up or down
         pitchAmount = invertPitch * flightControllerInput.ReadValue<Vector2>().y;
+        pitchFlap.localRotation = Quaternion.Euler(pitchAmount * flapRotation, 0, 0); // mesh flap rotation
         if (t!=0 && pitchAmount==0)
         {
             t = 0; //When not pitching reset time
@@ -156,8 +169,16 @@ public class PlaneMovement : MonoBehaviour
         }
         transform.Rotate(Vector3.right, tempPitchRotSpeed * pitchAmount * Time.deltaTime);
 
-       //Roll left or right
-        float rollAmountDir = flightControllerInput.ReadValue<Vector2>().x;  
+        //Roll left or right
+        float rollAmountDir = flightControllerInput.ReadValue<Vector2>().x;
+        foreach (Transform leftFlap in leftWingFlaps) {
+            leftFlap.localRotation = Quaternion.Euler(-rollAmountDir * flapRotation, 0, 0);
+        }
+        foreach (Transform rightflap in rightWingFlaps)
+        {
+            rightflap.localRotation = Quaternion.Euler(rollAmountDir * flapRotation, 0, 0);
+        }
+
         transform.Rotate(Vector3.forward, rollRotationSpeed * rollAmountDir * Time.deltaTime);
     }
 }
