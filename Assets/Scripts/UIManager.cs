@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private float pauseMenuShowDelay = 0.7f;
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private Slider fuelSlider;
+    [SerializeField] private RectTransform lifeIconList;
 
     [Header("Boost UI")]
     [SerializeField] private GameObject boostKnob;
@@ -25,12 +26,18 @@ public class UIManager : MonoBehaviour
         }
 
         FuelCountdown.instance.onFuelUpdate += UpdateFuel;
+        HealthCount.instance.onRemoveLife += RemoveLife;
         
         if (boostSystem != null)
         {
             boostSystem.OnBoostCountChanged += UpdateBoost;
             UpdateBoost(boostSystem.BoostCount);
         }
+    }
+
+    private void RemoveLife()
+    {
+        Destroy(lifeIconList.GetChild(0).gameObject);
     }
 
     private void UpdateFuel(float percentFill)

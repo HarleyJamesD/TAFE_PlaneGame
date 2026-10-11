@@ -5,13 +5,13 @@ using UnityEngine;
 public class FuelCountdown : MonoBehaviour
 {
     public static FuelCountdown instance;
-    [SerializeField] private float totalFuelAmount = 50f;
+    [SerializeField] private float totalFuelAmount = 10f;
     private float fuelAmount;
     private bool currentlyCountingDown = true;
     [SerializeField] private float hoopFuelAmount = 10f;
 
     public event Action<float> onFuelUpdate;
-    public event Action onFuelOut;
+    //public event Action onFuelOut;
 
     private void Awake()
     {
@@ -29,13 +29,15 @@ public class FuelCountdown : MonoBehaviour
 
     private IEnumerator FuelCountdownUpdate()
     {
-        if (fuelAmount <= 0)
-        {
-            onFuelOut.Invoke();
-            yield break;
-        }
         while (currentlyCountingDown)
         {
+            Debug.Log("Fuel Amount " + fuelAmount + " total fuel " + totalFuelAmount);
+            if (fuelAmount <= 0)
+            {
+                Debug.Log("Tried to remove life");
+                HealthCount.instance.RemoveLife();
+                yield break;
+            }
             fuelAmount -= Time.deltaTime;
             onFuelUpdate?.Invoke(fuelAmount / totalFuelAmount);
             yield return null;
