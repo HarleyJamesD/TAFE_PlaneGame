@@ -1,46 +1,51 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class PlaneMovement : MonoBehaviour
 {
-    [SerializeField] private float forwardMoveSpeed = 10f;
-    [SerializeField] private float forwardBoostSpeed = 70f;
-    [SerializeField] private float boostDuration = 2f;
-    private float currentPlaneSpeed;
-    [SerializeField] private float pitchRotationSpeed = 10f;
-    [SerializeField] private float rollRotationSpeed = 10f;
-    
-
-    [SerializeField] private bool invertedPitch = true;
-    private int invertPitch;
-
+    //Input
     private InputSystem_Actions inputActions;
 
     private InputAction flightControllerInput;
     private InputAction planeBoost;
     private InputAction planeShoot;
 
+    [SerializeField] private bool invertedPitch = true;
+    private int invertPitch;
+
+    [Header("Plane Movement")]
+    [SerializeField] private float forwardMoveSpeed = 10f;
+    private float currentPlaneSpeed;
+    [SerializeField] private float pitchRotationSpeed = 10f;
+    [SerializeField] private float rollRotationSpeed = 10f;
+    [SerializeField] private AnimationCurve pitchSpeedRamp;
+    private float durationToMaxPitch = 0.5f;
+    private float t = 0;
     public float PitchAmount { get { return pitchAmount; } }
     private float pitchAmount;
 
+    [Header("Boosting")]
+    [SerializeField] private float forwardBoostSpeed = 70f;
+    [SerializeField] private float boostDuration = 2f;
+    private PlaneBoostSystem planeBoostSystem;
+
+    [Header("Trail")]
     [SerializeField] private float trailBoostWidth = 1.6f;
     [SerializeField] private TrailRenderer leftTrail;
     private TrailRenderer leftTrailBoost;
     [SerializeField] private TrailRenderer rightTrail;
     private TrailRenderer rightTrailBoost;
 
+    [Header("Weapon Objects")]
     [SerializeField] private ObjectPool bulletPool;
     [SerializeField] private Transform gun;
 
-
-    [SerializeField] private AnimationCurve pitchSpeedRamp;
-    private float durationToMaxPitch = 0.5f;
-    private float t = 0;
-
+    [Header("Plane Animations")]
     [SerializeField] private Transform pitchFlap;
     [SerializeField] private List<Transform> leftWingFlaps = new List<Transform>();
     [SerializeField] private List<Transform> rightWingFlaps = new List<Transform>();
@@ -83,6 +88,8 @@ public class PlaneMovement : MonoBehaviour
         rightTrailBoost = rightTrail.transform.GetChild(0).GetComponent<TrailRenderer>();
 
         GameManager.instance.onGamePause += OnPause;
+
+        planeBoostSystem = GetComponent<PlaneBoostSystem>();
     }
 
     private void OnPause(bool isGamePaused)
@@ -108,20 +115,23 @@ public class PlaneMovement : MonoBehaviour
     Coroutine boostRoutine;
     public void StartPlaneBoost()
     {
-        //Check if player already boosting  
-        if (boostRoutine != null)
+        if (planeBoostSystem.TryUseBoost())
         {
-            StopCoroutine(boostRoutine); // Cancel current boost routine to avoid overwriting behaviour
-        }
-        boostRoutine = StartCoroutine(PlaneBoostRoutine());
+            //Check if player already boosting  
+            if (boostRoutine != null)
+            {
+                StopCoroutine(boostRoutine); // Cancel current boost routine to avoid overwriting behaviour
+            }
+            boostRoutine = StartCoroutine(PlaneBoostRoutine());
 
-        IEnumerator PlaneBoostRoutine()
-        {
-            currentPlaneSpeed = forwardBoostSpeed;
-            ToggleTrails(true);
-            yield return new WaitForSeconds(boostDuration);
-            currentPlaneSpeed = forwardMoveSpeed;
-            ToggleTrails(false);
+            IEnumerator PlaneBoostRoutine()
+            {
+                currentPlaneSpeed = forwardBoostSpeed;
+                ToggleTrails(true);
+                yield return new WaitForSeconds(boostDuration);
+                currentPlaneSpeed = forwardMoveSpeed;
+                ToggleTrails(false);
+            }
         }
     }
 

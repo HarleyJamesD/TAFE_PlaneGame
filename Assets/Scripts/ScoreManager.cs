@@ -16,6 +16,8 @@ public class ScoreManager : MonoBehaviour
             return;
         }
         instance = this;
+
+        GameManager.instance.onThroughHoop += AddScore;
     }
 
     public void AddScore(int addAmount)

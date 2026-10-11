@@ -12,11 +12,9 @@ public class HoopScoringBehaviour : MonoBehaviour
         Debug.Log(other.tag + " entered");
         if (other.CompareTag("Player"))
         {
-            Debug.Log(++Score); 
-            ScoreManager.instance.AddScore(pointValue);
+            GameManager.instance.onThroughHoop?.Invoke(pointValue); //Received in score manager and fuel
             gameObject.SetActive(false);
             hasScored = true;      //Lock behind
         }
-        
     }
 }

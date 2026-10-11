@@ -12,8 +12,6 @@ public class BalloonBehaviour : MonoBehaviour
         if (other.GetComponentInParent<PlaneMovement>())
         {
             other.GetComponentInParent<PlaneMovement>().StartPlaneBoost();
-
-            //planeMovement.StartPlaneBoost();
             return;
         }
         other.attachedRigidbody.gameObject.SetActive(false);
@@ -22,6 +20,7 @@ public class BalloonBehaviour : MonoBehaviour
     private void Pop()
     {
         Instantiate(balloonPopVFX, transform.position, Quaternion.identity);
+        GameManager.instance.onBalloonPop?.Invoke();
         Destroy(gameObject);
     }
 }

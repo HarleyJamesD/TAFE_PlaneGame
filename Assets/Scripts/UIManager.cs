@@ -1,14 +1,55 @@
 using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private GameObject pauseMenu;
     [SerializeField] private float pauseMenuShowDelay = 0.7f;
-    private void Awake()
+    [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private Slider fuelSlider;
+
+    [Header("Boost UI")]
+    [SerializeField] private GameObject boostKnob;
+    [SerializeField] private RectTransform boostList;
+    [SerializeField] private PlaneBoostSystem boostSystem;
+
+    private void OnEnable()
     {
         GameManager.instance.onGamePause += PauseGame;
+        if (ScoreManager.instance!=null)
+        {
+            ScoreManager.instance.onScoreChange += UpdateScore;
+        }
+
+        FuelCountdown.instance.onFuelUpdate += UpdateFuel;
+        
+        if (boostSystem != null)
+        {
+            boostSystem.OnBoostCountChanged += UpdateBoost;
+            UpdateBoost(boostSystem.BoostCount);
+        }
+    }
+
+    private void UpdateFuel(float percentFill)
+    {
+        fuelSlider.value = percentFill;
+    }
+
+    private void UpdateScore(int totalScore)
+    {
+        scoreText.text = totalScore.ToString();
+    }
+
+    private void OnDisable()
+    {
+        GameManager.instance.onGamePause -= PauseGame;
+        if (boostSystem != null)
+        {
+            boostSystem.OnBoostCountChanged -= UpdateBoost;
+        }
     }
 
     Coroutine pauseCoroutine;
@@ -32,5 +73,25 @@ public class UIManager : MonoBehaviour
             yield return new WaitForSecondsRealtime(pauseMenuShowDelay);
             pauseMenu.SetActive(true);
         }
+    }
+
+    private void UpdateBoost(int boostCount)
+    {
+        // Remove existing icons.
+        foreach (Transform child in boostList)
+        {
+            Destroy(child.gameObject);
+        }
+
+        // Create the correct number of icons.
+        for (int i = 0; i < boostCount; i++)
+        {
+            Instantiate(boostKnob, boostList);
+        }
+    }
+
+    private void FuelPercent(float percent)
+    {
+
     }
 }

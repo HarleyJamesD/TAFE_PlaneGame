@@ -45,12 +45,16 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 0f;
             isGamePaused = true;
         }
-        onGamePause.Invoke(isGamePaused);
+        onGamePause?.Invoke(isGamePaused);
     }
 
     public Action onPlayerDeath; //Called in camera controller
     public void PlayerDead()
     {
-        onPlayerDeath.Invoke();
+        onPlayerDeath?.Invoke();
     }
+
+    public Action onBalloonPop; //Invoked in BalloonBehaviour, 
+
+    public Action<int> onThroughHoop;
 }
