@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class PlaneBoostSystem : MonoBehaviour
 {
-    [SerializeField] private UIManager playerUI;
     [SerializeField] private int startingBoostAmount = 3;
     public int BoostCount { 
         get { return boostCount; }
@@ -14,14 +13,20 @@ public class PlaneBoostSystem : MonoBehaviour
     }
     private int boostCount;
     public event Action<int> OnBoostCountChanged;
-    void Start()
+
+    private void Awake()
     {
-        if (playerUI==null)
-        {
-            throw new Exception("Player UI is null for Plane Boost System.");
-        }
-        GameManager.instance.onBalloonPop += AddBoost;
         BoostCount = startingBoostAmount;
+    }
+
+    void OnEnable()
+    {
+        GameManager.instance.onBalloonPop += AddBoost;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.instance.onBalloonPop -= AddBoost;
     }
 
     public void AddBoost()

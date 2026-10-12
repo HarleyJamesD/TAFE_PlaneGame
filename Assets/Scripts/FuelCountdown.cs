@@ -20,8 +20,9 @@ public class FuelCountdown : MonoBehaviour
 
     private void Start()
     {
+        
         GameManager.instance.onThroughHoop += (int points) =>
-        {
+        {//Cant be unsubscribed
             AddFuel(hoopFuelAmount * points);
         };
         ResetFuel();

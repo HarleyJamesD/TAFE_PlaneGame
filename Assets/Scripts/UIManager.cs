@@ -31,7 +31,7 @@ public class UIManager : MonoBehaviour
         if (boostSystem != null)
         {
             boostSystem.OnBoostCountChanged += UpdateBoost;
-            UpdateBoost(boostSystem.BoostCount);
+            //UpdateBoost(boostSystem.BoostCount); //I dont think I need it because OnBoostChanged gets called itself
         }
     }
 
